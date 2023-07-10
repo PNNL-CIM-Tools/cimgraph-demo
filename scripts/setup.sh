@@ -2,7 +2,7 @@
 curl -sSL https://install.python-poetry.org | python3 -
 # Install GridAPPS-D Topology Processor
 git clone https://github.com/GRIDAPPSD/topology-processor -b dsa
-cd topology_processor
+cd topology-processor
 poetry install
 poetry build
 cd ..
@@ -13,7 +13,7 @@ python3 -m pip install -e CIMHub
 
 # Install CIMantic Graphs
 git clone https://github.com/PNNL-CIM-Tools/CIM-Graph.git -b techfest_2023
-cd cimgraph-demo
+cd CIM-Graph
 poety install
 poetry build
 pip install dist/*.whl
