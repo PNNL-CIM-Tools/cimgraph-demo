@@ -5,15 +5,12 @@ git clone https://github.com/GRIDAPPSD/topology-processor -b dsa
 cd topology_processor
 poetry install
 poetry build
-pip install dist/*.whl
-# Install CIMHub
 cd ..
-apt-get install maven
+pip install -e topology-processor
+# Install CIMHub
 git clone https://github.com/GRIDAPPSD/CIMHub.git -b final9500
 python3 -m pip install -e CIMHub
-cd CIMHub/cimhub
-mvn clean install
-cd ../..
+
 # Install CIMantic Graphs
 git clone https://github.com/PNNL-CIM-Tools/CIM-Graph.git -b techfest_2023
 cd cimgraph-demo
@@ -22,8 +19,4 @@ poetry build
 pip install dist/*.whl
 # Install DSS-Python
 pip install dss-python
-
-docker pull gridappsd/blazegraph
-docker run -d gridappsd/blazegraph
-
 
