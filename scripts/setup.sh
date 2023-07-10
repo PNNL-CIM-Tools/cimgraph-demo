@@ -20,3 +20,5 @@ pip install dist/*.whl
 # Install DSS-Python
 pip install dss-python
 
+# Start blazegraph running on port 8889
+docker run -d -p 8889:8080 gridappsd/blazegraph
