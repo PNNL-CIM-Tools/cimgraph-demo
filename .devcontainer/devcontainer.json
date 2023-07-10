@@ -4,6 +4,7 @@
 	"name": "Python 3.10 Modular",
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
 	"image": "mcr.microsoft.com/devcontainers/python:0-3.10",
+	"image": "gridappsd/blazegraph",
 	"hostRequirements": {
 		"cpus": 4
 	},
@@ -32,15 +33,15 @@
 		}
 	},
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	// "forwardPorts": [9000],
+	"forwardPorts": [8889],
 	// Use 'portsAttributes' to set default properties for specific forwarded ports. 
 	// More info: https://containers.dev/implementors/json_reference/#port-attributes
-	// "portsAttributes": {
-	// 	"9000": {
-	// 		"label": "Hello Remote World",
-	// 		"onAutoForward": "notify"
-	// 	}
-	// },
+	"portsAttributes": {
+	 	"8889": {
+	 		"label": "Blazegraph",
+	 		"onAutoForward": "slient"
+	 	}
+	},
 	// Use 'postCreateCommand' to run commands after the container is created.
 	"postCreateCommand": "bash scripts/setup.sh"
 	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
