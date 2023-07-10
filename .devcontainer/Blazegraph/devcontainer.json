@@ -1,37 +1,16 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
 // README at: https://github.com/devcontainers/templates/tree/main/src/python
 {
-	"name": "Python 3.10 Modular",
+	"name": "Blazegraph",
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-	"image": "mcr.microsoft.com/devcontainers/python:0-3.10",
-	"image": "gridappsd/blazegraph",
+	"image": "gridappsd/blazegraph:latest",
 	"hostRequirements": {
 		"cpus": 4
 	},
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},
 	// Configure tool-specific properties.
-	"customizations": {
-		// Configure properties specific to VS Code.
-		"vscode": {
-			"extensions": [
-				"ms-python.python",
-				"ms-python.vscode-pylance",
-				"github.vscode-pull-request-github",
-				"eamodio.gitlens"
-			],
-			"settings": {
-				"python.testing.pytestArgs": [
-					"."
-				],
-				"python.testing.unittestEnabled": false,
-				"python.testing.pytestEnabled": true,
-				"python.formatting.provider": "yapf",
-				"python.linting.mypyEnabled": true,
-				"python.linting.enabled": true
-			}
-		}
-	},
+
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	"forwardPorts": [8889],
 	// Use 'portsAttributes' to set default properties for specific forwarded ports. 
@@ -39,7 +18,7 @@
 	"portsAttributes": {
 	 	"8889": {
 	 		"label": "Blazegraph",
-	 		"onAutoForward": "slient"
+	 		"onAutoForward": "silent"
 	 	}
 	},
 	// Use 'postCreateCommand' to run commands after the container is created.
