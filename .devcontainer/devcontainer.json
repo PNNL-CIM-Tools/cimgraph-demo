@@ -19,7 +19,8 @@
 				"ms-python.python",
 				"ms-python.vscode-pylance",
 				"github.vscode-pull-request-github",
-				"eamodio.gitlens"
+				"eamodio.gitlens",
+				"ms-toolsai.jupyter"					
 			],
 			"settings": {
 				"python.testing.pytestArgs": [
