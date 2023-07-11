@@ -1,7 +1,7 @@
 # Setup script will run post creation of the environment.
 curl -sSL https://install.python-poetry.org | python3 -
 # Install GridAPPS-D Topology Processor
-git clone https://github.com/GRIDAPPSD/topology-processor -b dsa
+git clone https://github.com/GRIDAPPSD/topology-processor -b techfest_2023
 cd topology-processor
 poetry install
 poetry build
