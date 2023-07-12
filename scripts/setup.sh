@@ -24,16 +24,17 @@ cd ..
 # Install OpenDSSCMD 1.2.17
 cd dss/opendsscmd_1.2.17
 sudo cp opendsscmd /usr/local/bin
+sudo mkdir /usr/local/lib
 sudo cp lib* /usr/local/lib
 sudo chmod +x /usr/local/bin/opendsscmd
 sudo chmod +x /usr/local/lib/libklusolve.so
 sudo chmod +x /usr/local/lib/liblinenoise.so
+sudo export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/usr/local/lib"
 sudo apt-get update
 sudo apt-get -y install libzmq5-dev
 sudo apt-get -y install libczmq-dev
-# cd ../../..
-# mkdir Documents
-# mkdir OpenDSSCmd
+sudo mkdir /home/vscode/Documents
+sudo mkdir /home/vscode/Documents/OpenDSSCmd
 
 # Start blazegraph running on port 8889
 docker run -d -p 8889:8080 gridappsd/blazegraph
