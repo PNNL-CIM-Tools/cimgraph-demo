@@ -17,19 +17,23 @@ cd CIM-Graph
 poety install
 poetry build
 pip install dist/*.whl
+cd ..
 # Install DSS-Python
 # pip install dss-python
 
 # Install OpenDSSCMD 1.2.17
 cd dss/opendsscmd_1.2.17
-cp opendsscimd /usr/local/bin
-cp lib* /usr/local/lib
+sudo cp opendsscmd /usr/local/bin
+sudo cp lib* /usr/local/lib
+sudo chmod +x /usr/local/bin/opendsscmd
+sudo chmod +x /usr/local/lib/libklusolve.so
+sudo chmod +x /usr/local/lib/liblinenoise.so
 sudo apt-get update
 sudo apt-get -y install libzmq5-dev
 sudo apt-get -y install libczmq-dev
-cd ../../..
-mkdir Documents
-mkdir OpenDSSCmd
+# cd ../../..
+# mkdir Documents
+# mkdir OpenDSSCmd
 
 # Start blazegraph running on port 8889
 docker run -d -p 8889:8080 gridappsd/blazegraph
