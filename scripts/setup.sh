@@ -18,7 +18,11 @@ poety install
 poetry build
 pip install dist/*.whl
 # Install DSS-Python
-pip install dss-python
+# pip install dss-python
+
+# Install OpenDSSCMD 1.2.17
+curl --location --remote-header-name --remote-name https://github.com/GRIDAPPSD/GOSS-GridAPPS-D/blob/releases/2022.12.0/opendss/opendsscmd
+cp opendsscmd /usr/local/bin
 
 # Start blazegraph running on port 8889
 docker run -d -p 8889:8080 gridappsd/blazegraph
