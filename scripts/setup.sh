@@ -21,8 +21,15 @@ pip install dist/*.whl
 # pip install dss-python
 
 # Install OpenDSSCMD 1.2.17
-curl --location --remote-header-name --remote-name https://github.com/GRIDAPPSD/GOSS-GridAPPS-D/blob/releases/2022.12.0/opendss/opendsscmd
-cp opendsscmd /usr/local/bin
+cd dss/opendsscmd_1.2.17
+cp opendsscimd /usr/local/bin
+cp lib* /usr/local/lib
+sudo apt-get update
+sudo apt-get -y install libzmq5-dev
+sudo apt-get -y install libczmq-dev
+cd ../../..
+mkdir Documents
+mkdir OpenDSSCmd
 
 # Start blazegraph running on port 8889
 docker run -d -p 8889:8080 gridappsd/blazegraph
