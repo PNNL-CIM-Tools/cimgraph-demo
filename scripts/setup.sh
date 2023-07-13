@@ -19,7 +19,8 @@ poetry build
 pip install dist/*.whl
 cd ..
 # Install DSS-Python
-# pip install dss-python
+pip install dss-python
+pip install opendssdirect-py
 
 # Install OpenDSSCMD 1.2.17
 cd dss/opendsscmd_1.2.17
@@ -37,4 +38,4 @@ sudo mkdir /home/vscode/Documents
 sudo mkdir /home/vscode/Documents/OpenDSSCmd
 
 # Start blazegraph running on port 8889
-docker run -d -p 8889:8080 gridappsd/blazegraph
+docker run -d -p 8889 gridappsd/blazegraph

@@ -1,0 +1,88 @@
+
+<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF xmlns:cim="http://iec.ch/TC57/CIM100#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+
+<cim:Feeder rdf:about="urn:uuid:949b0ca3-cfc7-43b7-b6da-8f86140f7675">
+  <cim:Feeder.NormalEnergizingSubstation rdf:resource="urn:uuid:da500179-b667-4090-8e19-41e00deae97c"/>
+  <cim:IdentifiedObject.mRID>949b0ca3-cfc7-43b7-b6da-8f86140f7675</cim:IdentifiedObject.mRID>
+  <cim:IdentifiedObject.name>demo_feeder</cim:IdentifiedObject.name>
+</cim:Feeder>
+<cim:GeographicalRegion rdf:about="urn:uuid:f6d2130e-0581-4919-8fca-5e8c60c1ace8">
+  <cim:IdentifiedObject.mRID>f6d2130e-0581-4919-8fca-5e8c60c1ace8</cim:IdentifiedObject.mRID>
+  <cim:IdentifiedObject.name>demo_region</cim:IdentifiedObject.name>
+</cim:GeographicalRegion>
+<cim:SubGeographicalRegion rdf:about="urn:uuid:caa3baef-86bb-4487-bdfa-8f8022db4f60">
+  <cim:SubGeographicalRegion.Region rdf:resource="urn:uuid:f6d2130e-0581-4919-8fca-5e8c60c1ace8"/>
+  <cim:IdentifiedObject.mRID>caa3baef-86bb-4487-bdfa-8f8022db4f60</cim:IdentifiedObject.mRID>
+  <cim:IdentifiedObject.name>demo_subregion</cim:IdentifiedObject.name>
+</cim:SubGeographicalRegion>
+<cim:Substation rdf:about="urn:uuid:da500179-b667-4090-8e19-41e00deae97c">
+  <cim:Substation.Region rdf:resource="urn:uuid:caa3baef-86bb-4487-bdfa-8f8022db4f60"/>
+  <cim:IdentifiedObject.mRID>da500179-b667-4090-8e19-41e00deae97c</cim:IdentifiedObject.mRID>
+  <cim:IdentifiedObject.name>demo_sub</cim:IdentifiedObject.name>
+</cim:Substation>
+<cim:ACLineSegment rdf:about="urn:uuid:dc24e113-d63a-4406-b2de-62fb55dd5162">
+  <cim:ACLineSegment.bch>0.006</cim:ACLineSegment.bch>
+  <cim:ACLineSegment.r>0.004</cim:ACLineSegment.r>
+  <cim:ACLineSegment.x>0.08</cim:ACLineSegment.x>
+  <cim:Equipment.EquipmentContainer rdf:resource="urn:uuid:949b0ca3-cfc7-43b7-b6da-8f86140f7675"/>
+  <cim:IdentifiedObject.mRID>dc24e113-d63a-4406-b2de-62fb55dd5162</cim:IdentifiedObject.mRID>
+  <cim:IdentifiedObject.name>new_line</cim:IdentifiedObject.name>
+</cim:ACLineSegment>
+<cim:ACLineSegment rdf:about="urn:uuid:1c057831-220c-4985-b989-55782fa0dfa0">
+  <cim:ACLineSegment.bch>0.006</cim:ACLineSegment.bch>
+  <cim:ACLineSegment.r>0.004</cim:ACLineSegment.r>
+  <cim:ACLineSegment.x>0.08</cim:ACLineSegment.x>
+  <cim:Equipment.EquipmentContainer rdf:resource="urn:uuid:949b0ca3-cfc7-43b7-b6da-8f86140f7675"/>
+  <cim:IdentifiedObject.mRID>1c057831-220c-4985-b989-55782fa0dfa0</cim:IdentifiedObject.mRID>
+  <cim:IdentifiedObject.name>line_1_2</cim:IdentifiedObject.name>
+</cim:ACLineSegment>
+<cim:ACLineSegment rdf:about="urn:uuid:78610632-bbd5-41a3-80b8-ac2e0eb7bc1e">
+  <cim:ACLineSegment.bch>0.006</cim:ACLineSegment.bch>
+  <cim:ACLineSegment.r>0.004</cim:ACLineSegment.r>
+  <cim:ACLineSegment.x>0.08</cim:ACLineSegment.x>
+  <cim:Equipment.EquipmentContainer rdf:resource="urn:uuid:949b0ca3-cfc7-43b7-b6da-8f86140f7675"/>
+  <cim:IdentifiedObject.mRID>78610632-bbd5-41a3-80b8-ac2e0eb7bc1e</cim:IdentifiedObject.mRID>
+  <cim:IdentifiedObject.name>line_3_4</cim:IdentifiedObject.name>
+</cim:ACLineSegment>
+<cim:ConnectivityNode rdf:about="urn:uuid:33794cdb-d9ec-4e8a-bd45-700c0684e97f">
+  <cim:ConnectivityNode.ConnectivityNodeContainer rdf:resource="urn:uuid:949b0ca3-cfc7-43b7-b6da-8f86140f7675"/>
+  <cim:IdentifiedObject.mRID>33794cdb-d9ec-4e8a-bd45-700c0684e97f</cim:IdentifiedObject.mRID>
+  <cim:IdentifiedObject.name>bus_1</cim:IdentifiedObject.name>
+</cim:ConnectivityNode>
+<cim:ConnectivityNode rdf:about="urn:uuid:82655792-72c1-460a-9313-dc049f220cb5">
+  <cim:ConnectivityNode.ConnectivityNodeContainer rdf:resource="urn:uuid:949b0ca3-cfc7-43b7-b6da-8f86140f7675"/>
+  <cim:IdentifiedObject.mRID>82655792-72c1-460a-9313-dc049f220cb5</cim:IdentifiedObject.mRID>
+  <cim:IdentifiedObject.name>bus_2</cim:IdentifiedObject.name>
+</cim:ConnectivityNode>
+<cim:ConnectivityNode rdf:about="urn:uuid:0e3b4575-903a-4ca1-93fa-703a2c81d45a">
+  <cim:ConnectivityNode.ConnectivityNodeContainer rdf:resource="urn:uuid:949b0ca3-cfc7-43b7-b6da-8f86140f7675"/>
+  <cim:IdentifiedObject.mRID>0e3b4575-903a-4ca1-93fa-703a2c81d45a</cim:IdentifiedObject.mRID>
+  <cim:IdentifiedObject.name>bus_3</cim:IdentifiedObject.name>
+</cim:ConnectivityNode>
+<cim:ConnectivityNode rdf:about="urn:uuid:3d788771-95ee-4ab2-a26b-92748fb95a26">
+  <cim:ConnectivityNode.ConnectivityNodeContainer rdf:resource="urn:uuid:949b0ca3-cfc7-43b7-b6da-8f86140f7675"/>
+  <cim:IdentifiedObject.mRID>3d788771-95ee-4ab2-a26b-92748fb95a26</cim:IdentifiedObject.mRID>
+  <cim:IdentifiedObject.name>bus_4</cim:IdentifiedObject.name>
+</cim:ConnectivityNode>
+<cim:Terminal rdf:about="urn:uuid:dffa3b5d-e9af-4ed5-b763-b73998691f9f">
+  <cim:Terminal.ConductingEquipment rdf:resource="urn:uuid:1c057831-220c-4985-b989-55782fa0dfa0"/>
+  <cim:Terminal.ConnectivityNode rdf:resource="urn:uuid:33794cdb-d9ec-4e8a-bd45-700c0684e97f"/>
+  <cim:IdentifiedObject.mRID>dffa3b5d-e9af-4ed5-b763-b73998691f9f</cim:IdentifiedObject.mRID>
+</cim:Terminal>
+<cim:Terminal rdf:about="urn:uuid:55f41d61-0378-4140-92a8-af3ebdef1e54">
+  <cim:Terminal.ConductingEquipment rdf:resource="urn:uuid:1c057831-220c-4985-b989-55782fa0dfa0"/>
+  <cim:Terminal.ConnectivityNode rdf:resource="urn:uuid:82655792-72c1-460a-9313-dc049f220cb5"/>
+  <cim:IdentifiedObject.mRID>55f41d61-0378-4140-92a8-af3ebdef1e54</cim:IdentifiedObject.mRID>
+</cim:Terminal>
+<cim:Terminal rdf:about="urn:uuid:c6e37858-7145-4851-8888-8f654978038e">
+  <cim:Terminal.ConductingEquipment rdf:resource="urn:uuid:78610632-bbd5-41a3-80b8-ac2e0eb7bc1e"/>
+  <cim:Terminal.ConnectivityNode rdf:resource="urn:uuid:0e3b4575-903a-4ca1-93fa-703a2c81d45a"/>
+  <cim:IdentifiedObject.mRID>c6e37858-7145-4851-8888-8f654978038e</cim:IdentifiedObject.mRID>
+</cim:Terminal>
+<cim:Terminal rdf:about="urn:uuid:ff3a192e-ee98-4290-aede-b6c8e718870a">
+  <cim:Terminal.ConductingEquipment rdf:resource="urn:uuid:78610632-bbd5-41a3-80b8-ac2e0eb7bc1e"/>
+  <cim:Terminal.ConnectivityNode rdf:resource="urn:uuid:3d788771-95ee-4ab2-a26b-92748fb95a26"/>
+  <cim:IdentifiedObject.mRID>ff3a192e-ee98-4290-aede-b6c8e718870a</cim:IdentifiedObject.mRID>
+</cim:Terminal>
+</rdf:RDF>
