@@ -24,11 +24,14 @@ It will take several minutes for GitHub to install the Blazegraph Database, Open
 ## Start Jupyter Notebooks
 
 It is recommended to start with model_creator_demo. It covers the basic usage of CIM-Graph and syntax to create, edit, and parse CIM models.
+![open-book](./images/open_notebook.png)
 
 When starting the notebook, select a kernel to use:
 ![select-kernel-1](./images/startup_1.png)
 
 ![select-kernel-2](./images/startup_2.png)
 
+Then, run the notebook by advancing through the cells using `shift + enter` or using the play button
 
+![run-book](./images/run_notebook.png)
 
