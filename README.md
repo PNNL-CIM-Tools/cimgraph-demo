@@ -19,7 +19,13 @@ To launch the demo, click on the "Code" button and then select "Create codespace
 
 ![Create new Repository](./images/launch_codespace.png)
 
-It will take several minutes for GitHub to install the Blazegraph Database, OpenDSS, CIMHub, and CIM-Graph.
+It will take several minutes for GitHub to install the Blazegraph Database, OpenDSS, CIMHub, and CIM-Graph. You will see a splash screen while the containers are downloaded:
+
+![setup-0](./images/setup_0.png)
+
+After the codespace is created, the installer bash script will run to install all dependencies
+
+![setup-1](./images/setup_1.png)
 
 ## Start Jupyter Notebooks
 
