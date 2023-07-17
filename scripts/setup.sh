@@ -38,4 +38,4 @@ sudo mkdir /home/vscode/Documents
 sudo mkdir /home/vscode/Documents/OpenDSSCmd
 
 # Start blazegraph running on port 8889
-docker run -d -p 8889 gridappsd/blazegraph
+docker run -d -p 8889:8080 gridappsd/blazegraph
