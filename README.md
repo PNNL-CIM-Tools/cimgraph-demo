@@ -1,7 +1,7 @@
 # CIMantic Graphs Interactive Demo for GitHub Codespaces
 
 ## Overview
-This is a self contained dev environment for CIMantic Graphs for TechFest 2023. It contains three interactive tutorial notebooks for creating, converting, and querying for power system networks in the Common Information Model format.
+This is a self contained dev environment for CIMantic Graphs
 
 CIMantic Graphs is a Python library for creating in-memory labeled property graphs for creating, parsing, and editing CIM power system models. It creates Python object instances in memory using a data profile exported from a specified CIM profile. The library is being expanded to cover centralized applications, transmission models, and real-time editing of CIM XML models natively.
 
