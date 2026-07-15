@@ -76,3 +76,14 @@ CIMTool and GLIMPSE run on a lightweight Linux desktop served in your browser.
 
 Both apps are also installed under `/opt` (`/opt/cimtool`, `/opt/glimpse`) if you
 prefer to launch them from a terminal.
+
+### Sample CIM models
+
+Two IEEE feeder models are downloaded into `sample_models/` at setup so they show up
+in the app file explorers:
+
+* **`sample_models/IEEE9500bal.xml`** (~54 MB) — the headline demo model.
+* **`sample_models/IEEE13.xml`** (~407 KB) — a small fallback if the software-rendered
+  graph is slow on the noVNC desktop.
+
+Open either in **GLIMPSE** via its **Load** button, or import it into **CIMTool**.

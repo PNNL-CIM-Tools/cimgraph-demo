@@ -24,11 +24,18 @@ GLIMPSE_VERSION="0.8.0"
 GLIMPSE_APPIMAGE="GLIMPSE-${GLIMPSE_VERSION}.AppImage"
 GLIMPSE_URL="https://github.com/pnnl/GLIMPSE/releases/download/v${GLIMPSE_VERSION}/${GLIMPSE_APPIMAGE}"
 
+# Sample CIM feeder models, pulled from the public GRIDAPPSD Powergrid-Models repo
+# at postCreate (avoids committing a 54MB blob / git-lfs into this demo repo).
+SAMPLE_MODELS_BASE="https://raw.githubusercontent.com/GRIDAPPSD/Powergrid-Models/develop/models/feeders/CIM/XML"
+SAMPLE_9500_URL="${SAMPLE_MODELS_BASE}/IEEE9500bal/IEEE9500bal.xml"
+SAMPLE_IEEE13_URL="${SAMPLE_MODELS_BASE}/IEEE13/IEEE13.xml"
+
 OPT_CIMTOOL="/opt/cimtool"
 OPT_GLIMPSE="/opt/glimpse"
 DESKTOP_DIR="${HOME}/Desktop"
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+SAMPLE_DIR="${REPO_ROOT}/sample_models"
 
 echo "==============================================================="
 echo " CIM Tools demo setup"
@@ -67,6 +74,16 @@ fi
 echo
 echo "[2/5] Creating Python environment with uv..."
 cd "$REPO_ROOT"
+# The workspace is a persistent bind-mount, so a .venv from an earlier build (or
+# from running uv on the host) can survive with an interpreter that no longer
+# exists here. uv then tries to rebuild in place and can hit a permission error
+# on the stale tree. If .venv's interpreter is dead, remove it for a clean sync.
+if [ -d .venv ] && ! .venv/bin/python -c '' >/dev/null 2>&1; then
+	echo "  removing stale .venv (interpreter no longer valid)"
+	# A prior container may have written root-owned files into .venv; fall back
+	# to sudo if a plain remove can't clear them.
+	rm -rf .venv 2>/dev/null || sudo rm -rf .venv
+fi
 uv sync
 # Register a Jupyter kernel so the notebooks find this env in VS Code.
 uv run python -m ipykernel install --user \
@@ -113,9 +130,34 @@ else
 	echo "  installed to ${OPT_GLIMPSE}/squashfs-root"
 fi
 
-# --- Section 5: Desktop launchers (shown on the noVNC desktop) -----------------
+# --- Section 5: Sample CIM feeder models --------------------------------------
+# Downloaded into the workspace so they appear in the GUI file explorers
+# (GLIMPSE "Load", CIMTool import). Fail-soft: a network/upstream failure must
+# not abort setup — the GUI apps and notebooks still work without the samples.
 echo
-echo "[5/5] Writing desktop launchers..."
+echo "[5/6] Downloading sample CIM feeder models..."
+mkdir -p "$SAMPLE_DIR"
+download_sample() {
+	# $1 = url, $2 = destination filename
+	local url="$1" dest="${SAMPLE_DIR}/$2"
+	if [ -s "$dest" ]; then
+		echo "  $2 already present, skipping."
+		return 0
+	fi
+	echo "  downloading $2..."
+	if curl -fL --retry 3 -o "$dest" "$url"; then
+		echo "  saved $2 ($(du -h "$dest" | cut -f1))"
+	else
+		echo "  WARNING: could not download $2 from $url — skipping." >&2
+		rm -f "$dest"
+	fi
+}
+download_sample "$SAMPLE_IEEE13_URL" "IEEE13.xml"
+download_sample "$SAMPLE_9500_URL"   "IEEE9500bal.xml"
+
+# --- Section 6: Desktop launchers (shown on the noVNC desktop) -----------------
+echo
+echo "[6/6] Writing desktop launchers..."
 mkdir -p "$DESKTOP_DIR"
 
 cat > "${DESKTOP_DIR}/CIMTool.desktop" <<EOF
@@ -129,14 +171,23 @@ Terminal=false
 Categories=Development;
 EOF
 
-# --no-sandbox is required for Electron running as a container user without a
-# user namespace sandbox.
+# Electron launch flags for the headless noVNC desktop:
+#   --no-sandbox         : required when running as a container user with no
+#                          user-namespace sandbox.
+#   --use-gl=angle
+#   --use-angle=swiftshader
+#   --enable-unsafe-swiftshader : force software GL via SwiftShader. Without this,
+#                          --disable-gpu falls back to Chromium's X11 software-BITMAP
+#                          presenter, which fails XGetWindowAttributes under Xtigervnc
+#                          — menus/dialogs (hamburger, About, Load) then never
+#                          composite and clicks don't route. SwiftShader composites
+#                          correctly, so the UI is fully interactive.
 cat > "${DESKTOP_DIR}/GLIMPSE.desktop" <<EOF
 [Desktop Entry]
 Type=Application
 Name=GLIMPSE
 Comment=Power system graph visualizer (Electron)
-Exec=${OPT_GLIMPSE}/squashfs-root/AppRun --no-sandbox
+Exec=${OPT_GLIMPSE}/squashfs-root/AppRun --no-sandbox --use-gl=angle --use-angle=swiftshader --enable-unsafe-swiftshader
 Terminal=false
 Categories=Development;
 EOF
@@ -149,4 +200,5 @@ echo " Setup complete."
 echo "   Notebooks : run in VS Code with the 'Python (cimgraph-demo)' kernel."
 echo "   GUI apps  : open forwarded port 6080 (noVNC, password 'cimtool')"
 echo "               then launch CIMTool / GLIMPSE from the desktop icons."
+echo "   Samples   : sample_models/IEEE9500bal.xml (or IEEE13.xml if slow)."
 echo "==============================================================="
