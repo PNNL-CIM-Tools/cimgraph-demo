@@ -72,10 +72,18 @@ CIMTool and GLIMPSE run on a lightweight Linux desktop served in your browser.
 1. Open the **Ports** tab and click the forwarded **port 6080**
    ("CIMTool + GLIMPSE Desktop (noVNC)"). It also auto-opens on first create.
 2. When prompted for the noVNC password, enter **`cimtool`**.
-3. On the desktop, double-click the **CIMTool** or **GLIMPSE** icon to launch.
+3. **Right-click the desktop** and choose **CIMTool** (morning session) or
+   **GLIMPSE** (afternoon session) from the menu.
 
-Both apps are also installed under `/opt` (`/opt/cimtool`, `/opt/glimpse`) if you
-prefer to launch them from a terminal.
+Either app can also be started from a terminal (the VS Code terminal works too):
+
+```bash
+scripts/launch-cimtool.sh   # CIMTool
+scripts/launch-glimpse.sh   # GLIMPSE
+```
+
+CIMTool opens on the `~/cimtool-ws` workspace with the **CGMES-CIM17** project
+(cloned at setup) already in its Project Explorer — no manual import needed.
 
 ### Sample CIM models
 

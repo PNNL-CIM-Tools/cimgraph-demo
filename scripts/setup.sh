@@ -30,6 +30,14 @@ SAMPLE_MODELS_BASE="https://raw.githubusercontent.com/GRIDAPPSD/Powergrid-Models
 SAMPLE_9500_URL="${SAMPLE_MODELS_BASE}/IEEE9500bal/IEEE9500bal.xml"
 SAMPLE_IEEE13_URL="${SAMPLE_MODELS_BASE}/IEEE13/IEEE13.xml"
 
+# CGMES-CIM17 is itself a CIMTool project (its inner CGMES-CIM17/ folder has a
+# .project + Schema/Profiles). Cloned into the CIMTool workspace so it shows up
+# in the Project Explorer for the morning session. Tracks latest master.
+CGMES_REPO_URL="https://github.com/cimug-org/CGMES-CIM17.git"
+# CIMTool workspace: launch-cimtool.sh opens CIMTool with `-data $CIMTOOL_WS`,
+# so anything placed here appears as a project on launch (no manual import).
+CIMTOOL_WS="${HOME}/cimtool-ws"
+
 OPT_CIMTOOL="/opt/cimtool"
 OPT_GLIMPSE="/opt/glimpse"
 DESKTOP_DIR="${HOME}/Desktop"
@@ -48,7 +56,7 @@ echo "==============================================================="
 # graphviz          : PlantUML shells out to `dot` for CIMTool profile diagrams.
 # libgtk/gbm/asound/nss : Electron (GLIMPSE) runtime libs.
 echo
-echo "[1/5] Installing system GUI/runtime dependencies..."
+echo "[1/7] Installing system GUI/runtime dependencies..."
 sudo apt-get update
 sudo apt-get install -y --no-install-recommends \
 	libwebkit2gtk-4.1-0 \
@@ -72,7 +80,7 @@ fi
 
 # --- Section 2: Python environment (cimgraph + Jupyter) -----------------------
 echo
-echo "[2/5] Creating Python environment with uv..."
+echo "[2/7] Creating Python environment with uv..."
 cd "$REPO_ROOT"
 # The workspace is a persistent bind-mount, so a .venv from an earlier build (or
 # from running uv on the host) can survive with an interpreter that no longer
@@ -91,7 +99,7 @@ uv run python -m ipykernel install --user \
 
 # --- Section 3: CIMTool (GUI, from GitHub release tarball) ---------------------
 echo
-echo "[3/5] Installing CIMTool ${CIMTOOL_VERSION} (${CIMTOOL_TAG})..."
+echo "[3/7] Installing CIMTool ${CIMTOOL_VERSION} (${CIMTOOL_TAG})..."
 if [ -x "${OPT_CIMTOOL}/CIMTool-${CIMTOOL_VERSION}/CIMTool" ]; then
 	echo "  already installed, skipping."
 else
@@ -111,11 +119,39 @@ else
 	echo "  installed to ${OPT_CIMTOOL}/CIMTool-${CIMTOOL_VERSION}"
 fi
 
+# --- Section 3b: CGMES-CIM17 CIMTool project (into the CIMTool workspace) ------
+# Clone the CGMES-CIM17 CIMTool project into the workspace that launch-cimtool.sh
+# opens, so it appears in CIMTool's Project Explorer on launch. The repo nests the
+# actual project one level down (CGMES-CIM17/CGMES-CIM17), so we move that inner
+# folder up into the workspace. Fail-soft: a clone failure warns but must not
+# abort setup — CIMTool still runs, just without the pre-loaded project.
+echo
+echo "[4/7] Cloning CGMES-CIM17 project into CIMTool workspace..."
+mkdir -p "$CIMTOOL_WS"
+if [ -f "${CIMTOOL_WS}/CGMES-CIM17/.project" ]; then
+	echo "  already present, skipping."
+else
+	tmp="$(mktemp -d)"
+	if git clone --depth 1 "$CGMES_REPO_URL" "${tmp}/repo"; then
+		# The importable CIMTool project is the nested CGMES-CIM17/CGMES-CIM17.
+		if [ -f "${tmp}/repo/CGMES-CIM17/.project" ]; then
+			rm -rf "${CIMTOOL_WS}/CGMES-CIM17"
+			mv "${tmp}/repo/CGMES-CIM17" "${CIMTOOL_WS}/CGMES-CIM17"
+			echo "  installed CGMES-CIM17 into ${CIMTOOL_WS}"
+		else
+			echo "  WARNING: cloned repo has no CGMES-CIM17/.project — skipping." >&2
+		fi
+	else
+		echo "  WARNING: could not clone ${CGMES_REPO_URL} — skipping." >&2
+	fi
+	rm -rf "$tmp"
+fi
+
 # --- Section 4: GLIMPSE (GUI, from AppImage) ----------------------------------
 # AppImages need FUSE; rather than depend on it in the container we extract the
 # AppImage and run its AppRun directly (the FUSE-free path).
 echo
-echo "[4/5] Installing GLIMPSE ${GLIMPSE_VERSION}..."
+echo "[5/7] Installing GLIMPSE ${GLIMPSE_VERSION}..."
 if [ -x "${OPT_GLIMPSE}/squashfs-root/AppRun" ]; then
 	echo "  already installed, skipping."
 else
@@ -130,12 +166,12 @@ else
 	echo "  installed to ${OPT_GLIMPSE}/squashfs-root"
 fi
 
-# --- Section 5: Sample CIM feeder models --------------------------------------
+# --- Section 6: Sample CIM feeder models --------------------------------------
 # Downloaded into the workspace so they appear in the GUI file explorers
 # (GLIMPSE "Load", CIMTool import). Fail-soft: a network/upstream failure must
 # not abort setup — the GUI apps and notebooks still work without the samples.
 echo
-echo "[5/6] Downloading sample CIM feeder models..."
+echo "[6/7] Downloading sample CIM feeder models..."
 mkdir -p "$SAMPLE_DIR"
 download_sample() {
 	# $1 = url, $2 = destination filename
@@ -155,50 +191,68 @@ download_sample() {
 download_sample "$SAMPLE_IEEE13_URL" "IEEE13.xml"
 download_sample "$SAMPLE_9500_URL"   "IEEE9500bal.xml"
 
-# --- Section 6: Desktop launchers (shown on the noVNC desktop) -----------------
+# --- Section 7: Desktop launchers + fluxbox menu ------------------------------
+# The two GUI apps are launched via scripts/launch-{cimtool,glimpse}.sh (one per
+# tutorial session — CIMTool = morning, GLIMPSE = afternoon). The .desktop files
+# and the fluxbox right-click menu both point at those scripts, so there's a
+# single source of truth for launch args (workspace path, swiftshader flags).
 echo
-echo "[6/6] Writing desktop launchers..."
+echo "[7/7] Writing desktop launchers and fluxbox menu entries..."
+LAUNCH_CIMTOOL="${REPO_ROOT}/scripts/launch-cimtool.sh"
+LAUNCH_GLIMPSE="${REPO_ROOT}/scripts/launch-glimpse.sh"
+chmod +x "$LAUNCH_CIMTOOL" "$LAUNCH_GLIMPSE"
+
 mkdir -p "$DESKTOP_DIR"
 
 cat > "${DESKTOP_DIR}/CIMTool.desktop" <<EOF
 [Desktop Entry]
 Type=Application
 Name=CIMTool
-Comment=CIM profile and model editor (Eclipse RCP)
-Exec=${OPT_CIMTOOL}/CIMTool-${CIMTOOL_VERSION}/CIMTool
+Comment=CIM profile and model editor (Eclipse RCP) — tutorial morning session
+Exec=${LAUNCH_CIMTOOL}
 Icon=${OPT_CIMTOOL}/CIMTool-${CIMTOOL_VERSION}/icon.xpm
 Terminal=false
 Categories=Development;
 EOF
 
-# Electron launch flags for the headless noVNC desktop:
-#   --no-sandbox         : required when running as a container user with no
-#                          user-namespace sandbox.
-#   --use-gl=angle
-#   --use-angle=swiftshader
-#   --enable-unsafe-swiftshader : force software GL via SwiftShader. Without this,
-#                          --disable-gpu falls back to Chromium's X11 software-BITMAP
-#                          presenter, which fails XGetWindowAttributes under Xtigervnc
-#                          — menus/dialogs (hamburger, About, Load) then never
-#                          composite and clicks don't route. SwiftShader composites
-#                          correctly, so the UI is fully interactive.
 cat > "${DESKTOP_DIR}/GLIMPSE.desktop" <<EOF
 [Desktop Entry]
 Type=Application
 Name=GLIMPSE
-Comment=Power system graph visualizer (Electron)
-Exec=${OPT_GLIMPSE}/squashfs-root/AppRun --no-sandbox --use-gl=angle --use-angle=swiftshader --enable-unsafe-swiftshader
+Comment=Power system graph visualizer (Electron) — tutorial afternoon session
+Exec=${LAUNCH_GLIMPSE}
 Terminal=false
 Categories=Development;
 EOF
 
 chmod +x "${DESKTOP_DIR}/CIMTool.desktop" "${DESKTOP_DIR}/GLIMPSE.desktop"
 
+# fluxbox shows nothing on the desktop by default, so make the apps reachable
+# from its right-click menu. desktop-lite writes ~/.fluxbox/menu once and does
+# not regenerate it, so inserting our entries here is stable. Guard on a grep so
+# re-running setup.sh doesn't add duplicates; fail-soft if the menu is missing.
+FLUXBOX_MENU="${HOME}/.fluxbox/menu"
+if [ -f "$FLUXBOX_MENU" ]; then
+	if ! grep -q "launch-cimtool.sh" "$FLUXBOX_MENU"; then
+		# Insert the two entries right after the [begin] line (top of the menu).
+		sed -i "/^\[begin\]/a\\
+    [exec] (CIMTool) { ${LAUNCH_CIMTOOL} } <>\\
+    [exec] (GLIMPSE) { ${LAUNCH_GLIMPSE} } <>" "$FLUXBOX_MENU"
+		echo "  added CIMTool and GLIMPSE to the fluxbox right-click menu."
+	else
+		echo "  fluxbox menu entries already present, skipping."
+	fi
+else
+	echo "  WARNING: ${FLUXBOX_MENU} not found — skipping menu entries." >&2
+fi
+
 echo
 echo "==============================================================="
 echo " Setup complete."
 echo "   Notebooks : run in VS Code with the 'Python (cimgraph-demo)' kernel."
-echo "   GUI apps  : open forwarded port 6080 (noVNC, password 'cimtool')"
-echo "               then launch CIMTool / GLIMPSE from the desktop icons."
+echo "   GUI apps  : open forwarded port 6080 (noVNC, password 'cimtool'),"
+echo "               then right-click the desktop -> CIMTool or GLIMPSE"
+echo "               (or run scripts/launch-cimtool.sh / launch-glimpse.sh)."
+echo "   CIMTool   : opens ${CIMTOOL_WS} with the CGMES-CIM17 project loaded."
 echo "   Samples   : sample_models/IEEE9500bal.xml (or IEEE13.xml if slow)."
 echo "==============================================================="
