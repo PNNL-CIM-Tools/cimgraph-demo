@@ -244,9 +244,14 @@ if [ -d "${CIMTOOL_WS}/ieee-pes-cim-tutorial" ]; then
 fi
 echo "  linked samples into ${GLIMPSE_WS} (for the GLIMPSE Load dialog)."
 
-# Add ~/glimpse-ws to the GTK3 file-chooser sidebar (one-click in GLIMPSE).
+# Add workspace folders to the GTK3 file-chooser sidebar (one-click access in
+# both CIMTool's import dialog and GLIMPSE's Load dialog).
 GTK_BOOKMARKS="${HOME}/.config/gtk-3.0/bookmarks"
 mkdir -p "$(dirname "$GTK_BOOKMARKS")"
+if ! grep -qsF "file://${CIMTOOL_WS}" "$GTK_BOOKMARKS" 2>/dev/null; then
+	echo "file://${CIMTOOL_WS} CIMTool workspace" >> "$GTK_BOOKMARKS"
+	echo "  added ${CIMTOOL_WS} to the GTK file-chooser sidebar."
+fi
 if ! grep -qsF "file://${GLIMPSE_WS}" "$GTK_BOOKMARKS" 2>/dev/null; then
 	echo "file://${GLIMPSE_WS} GLIMPSE samples" >> "$GTK_BOOKMARKS"
 	echo "  added ${GLIMPSE_WS} to the GTK file-chooser sidebar."
