@@ -11,6 +11,10 @@
 #
 #  Works from a terminal inside the noVNC desktop or from the VS Code terminal;
 #  DISPLAY defaults to the desktop-lite VNC display (:1).
+#
+#  Sample models: GLIMPSE's "Load" is a browser file dialog that opens at $HOME,
+#  so setup.sh links the sample feeders into ~/glimpse-ws (and bookmarks it in
+#  the chooser sidebar). Load a model from there.
 # =============================================================================
 set -euo pipefail
 
