@@ -34,6 +34,10 @@ SAMPLE_IEEE13_URL="${SAMPLE_MODELS_BASE}/IEEE13/IEEE13.xml"
 # .project + Schema/Profiles). Cloned into the CIMTool workspace so it shows up
 # in the Project Explorer for the morning session. Tracks latest master.
 CGMES_REPO_URL="https://github.com/cimug-org/CGMES-CIM17.git"
+# IEEE PES CIM tutorial repo — instance data, Sparx EA models, and a CIMTool
+# project (CIMTool-Projects/Part9-ed3). Cloned whole into the CIMTool workspace
+# since its contents are still evolving upstream. Tracks latest master.
+TUTORIAL_REPO_URL="https://github.com/cimug-org/ieee-pes-cim-tutorial.git"
 # CIMTool workspace: launch-cimtool.sh opens CIMTool with `-data $CIMTOOL_WS`,
 # so anything placed here appears as a project on launch (no manual import).
 CIMTOOL_WS="${HOME}/cimtool-ws"
@@ -161,6 +165,20 @@ else
 	rm -rf "$tmp"
 fi
 
+# ieee-pes-cim-tutorial: clone the entire repo into the workspace as-is. It has
+# instance data (XML), Sparx EA models (.qea), and a CIMTool project inside
+# CIMTool-Projects/Part9-ed3. Repo is still evolving upstream, so we keep the
+# whole tree rather than extracting a single folder. Fail-soft.
+if [ -d "${CIMTOOL_WS}/ieee-pes-cim-tutorial/.git" ]; then
+	echo "  ieee-pes-cim-tutorial already present, skipping."
+else
+	if git clone --depth 1 "$TUTORIAL_REPO_URL" "${CIMTOOL_WS}/ieee-pes-cim-tutorial"; then
+		echo "  cloned ieee-pes-cim-tutorial into ${CIMTOOL_WS}"
+	else
+		echo "  WARNING: could not clone ${TUTORIAL_REPO_URL} — skipping." >&2
+	fi
+fi
+
 # --- Section 4: GLIMPSE (GUI, from AppImage) ----------------------------------
 # AppImages need FUSE; rather than depend on it in the container we extract the
 # AppImage and run its AppRun directly (the FUSE-free path).
@@ -220,6 +238,10 @@ for f in IEEE13.xml IEEE9500bal.xml; do
 		ln -sfn "${SAMPLE_DIR}/${f}" "${GLIMPSE_WS}/${f}"
 	fi
 done
+# Also link the tutorial repo's instance data so GLIMPSE can see it too.
+if [ -d "${CIMTOOL_WS}/ieee-pes-cim-tutorial" ]; then
+	ln -sfn "${CIMTOOL_WS}/ieee-pes-cim-tutorial" "${GLIMPSE_WS}/ieee-pes-cim-tutorial"
+fi
 echo "  linked samples into ${GLIMPSE_WS} (for the GLIMPSE Load dialog)."
 
 # Add ~/glimpse-ws to the GTK3 file-chooser sidebar (one-click in GLIMPSE).
