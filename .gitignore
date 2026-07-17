@@ -1,4 +1,5 @@
-# CIMTool Java binaries
+# CIMTool source + release binaries (local clones for agent dev, not part of the demo)
+CIMTool/
 CIMTool-Releases/
 
 # Sample CIM feeder models — downloaded at postCreate by scripts/setup.sh
