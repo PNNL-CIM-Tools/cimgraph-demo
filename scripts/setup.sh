@@ -37,6 +37,11 @@ CGMES_REPO_URL="https://github.com/cimug-org/CGMES-CIM17.git"
 # CIMTool workspace: launch-cimtool.sh opens CIMTool with `-data $CIMTOOL_WS`,
 # so anything placed here appears as a project on launch (no manual import).
 CIMTOOL_WS="${HOME}/cimtool-ws"
+# GLIMPSE workspace (afternoon session). GLIMPSE's "Load" is a browser
+# <input type=file> dialog, which the app can't point at a directory — GTK
+# opens it at $HOME. So the sample feeders are symlinked into a folder under
+# $HOME (separate from CIMTool's workspace) where the dialog can see them.
+GLIMPSE_WS="${HOME}/glimpse-ws"
 
 OPT_CIMTOOL="/opt/cimtool"
 OPT_GLIMPSE="/opt/glimpse"
@@ -55,8 +60,15 @@ echo "==============================================================="
 # libwebkit2gtk-4.1 : CIMTool's SWT Browser (profile SVG view) needs it.
 # graphviz          : PlantUML shells out to `dot` for CIMTool profile diagrams.
 # libgtk/gbm/asound/nss : Electron (GLIMPSE) runtime libs.
+# netsurf-gtk       : lightweight browser for CIMTool's "open in browser" (HTML
+#                     profile docs). Chosen over firefox/chromium (snap-only on
+#                     24.04) and epiphany (needs bwrap user-namespaces, which are
+#                     disabled here) — netsurf renders with no sandbox/D-Bus.
+# file              : xdg-open shells out to `file --mime-type` to detect a local
+#                     file's type; without it xdg-open can't resolve text/html and
+#                     falls back to mousepad. Required for the browser default to work.
 echo
-echo "[1/7] Installing system GUI/runtime dependencies..."
+echo "[1/8] Installing system GUI/runtime dependencies..."
 sudo apt-get update
 sudo apt-get install -y --no-install-recommends \
 	libwebkit2gtk-4.1-0 \
@@ -66,7 +78,9 @@ sudo apt-get install -y --no-install-recommends \
 	libasound2t64 \
 	libnss3 \
 	libatk-bridge2.0-0t64 \
-	fuse3
+	fuse3 \
+	netsurf-gtk \
+	file
 
 # On some Ubuntu images /usr/bin/dot is a dangling symlink to the
 # libgvc6-config-update stub (no working layout engine). dot_builtins is a
@@ -80,7 +94,7 @@ fi
 
 # --- Section 2: Python environment (cimgraph + Jupyter) -----------------------
 echo
-echo "[2/7] Creating Python environment with uv..."
+echo "[2/8] Creating Python environment with uv..."
 cd "$REPO_ROOT"
 # The workspace is a persistent bind-mount, so a .venv from an earlier build (or
 # from running uv on the host) can survive with an interpreter that no longer
@@ -99,7 +113,7 @@ uv run python -m ipykernel install --user \
 
 # --- Section 3: CIMTool (GUI, from GitHub release tarball) ---------------------
 echo
-echo "[3/7] Installing CIMTool ${CIMTOOL_VERSION} (${CIMTOOL_TAG})..."
+echo "[3/8] Installing CIMTool ${CIMTOOL_VERSION} (${CIMTOOL_TAG})..."
 if [ -x "${OPT_CIMTOOL}/CIMTool-${CIMTOOL_VERSION}/CIMTool" ]; then
 	echo "  already installed, skipping."
 else
@@ -126,7 +140,7 @@ fi
 # folder up into the workspace. Fail-soft: a clone failure warns but must not
 # abort setup — CIMTool still runs, just without the pre-loaded project.
 echo
-echo "[4/7] Cloning CGMES-CIM17 project into CIMTool workspace..."
+echo "[4/8] Cloning CGMES-CIM17 project into CIMTool workspace..."
 mkdir -p "$CIMTOOL_WS"
 if [ -f "${CIMTOOL_WS}/CGMES-CIM17/.project" ]; then
 	echo "  already present, skipping."
@@ -151,7 +165,7 @@ fi
 # AppImages need FUSE; rather than depend on it in the container we extract the
 # AppImage and run its AppRun directly (the FUSE-free path).
 echo
-echo "[5/7] Installing GLIMPSE ${GLIMPSE_VERSION}..."
+echo "[5/8] Installing GLIMPSE ${GLIMPSE_VERSION}..."
 if [ -x "${OPT_GLIMPSE}/squashfs-root/AppRun" ]; then
 	echo "  already installed, skipping."
 else
@@ -167,11 +181,13 @@ else
 fi
 
 # --- Section 6: Sample CIM feeder models --------------------------------------
-# Downloaded into the workspace so they appear in the GUI file explorers
-# (GLIMPSE "Load", CIMTool import). Fail-soft: a network/upstream failure must
-# not abort setup — the GUI apps and notebooks still work without the samples.
+# Downloaded into the repo's sample_models/ (the source of truth — visible in
+# the VS Code explorer and on the host), then symlinked into ~/glimpse-ws so
+# GLIMPSE's file dialog can see them (see the symlink step below for why).
+# Fail-soft: a network/upstream failure must not abort setup — the GUI apps and
+# notebooks still work without the samples.
 echo
-echo "[6/7] Downloading sample CIM feeder models..."
+echo "[6/8] Downloading sample CIM feeder models..."
 mkdir -p "$SAMPLE_DIR"
 download_sample() {
 	# $1 = url, $2 = destination filename
@@ -191,13 +207,36 @@ download_sample() {
 download_sample "$SAMPLE_IEEE13_URL" "IEEE13.xml"
 download_sample "$SAMPLE_9500_URL"   "IEEE9500bal.xml"
 
+# GLIMPSE's "Load" is a browser <input type=file> dialog (its Electron main.js
+# has no native open-dialog), so the app can't preset the starting directory —
+# GTK opens the chooser at $HOME. sample_models/ lives under /workspaces/... (a
+# different tree), so it isn't visible there. Symlink each sample into a folder
+# under $HOME (~/glimpse-ws) so it shows up where the dialog opens, and add a
+# GTK bookmark so it's one click from the chooser sidebar. Keeps the repo copy
+# as the source of truth. Fail-soft.
+mkdir -p "$GLIMPSE_WS"
+for f in IEEE13.xml IEEE9500bal.xml; do
+	if [ -s "${SAMPLE_DIR}/${f}" ]; then
+		ln -sfn "${SAMPLE_DIR}/${f}" "${GLIMPSE_WS}/${f}"
+	fi
+done
+echo "  linked samples into ${GLIMPSE_WS} (for the GLIMPSE Load dialog)."
+
+# Add ~/glimpse-ws to the GTK3 file-chooser sidebar (one-click in GLIMPSE).
+GTK_BOOKMARKS="${HOME}/.config/gtk-3.0/bookmarks"
+mkdir -p "$(dirname "$GTK_BOOKMARKS")"
+if ! grep -qsF "file://${GLIMPSE_WS}" "$GTK_BOOKMARKS" 2>/dev/null; then
+	echo "file://${GLIMPSE_WS} GLIMPSE samples" >> "$GTK_BOOKMARKS"
+	echo "  added ${GLIMPSE_WS} to the GTK file-chooser sidebar."
+fi
+
 # --- Section 7: Desktop launchers + fluxbox menu ------------------------------
 # The two GUI apps are launched via scripts/launch-{cimtool,glimpse}.sh (one per
 # tutorial session — CIMTool = morning, GLIMPSE = afternoon). The .desktop files
 # and the fluxbox right-click menu both point at those scripts, so there's a
 # single source of truth for launch args (workspace path, swiftshader flags).
 echo
-echo "[7/7] Writing desktop launchers and fluxbox menu entries..."
+echo "[7/8] Writing desktop launchers and fluxbox menu entries..."
 LAUNCH_CIMTOOL="${REPO_ROOT}/scripts/launch-cimtool.sh"
 LAUNCH_GLIMPSE="${REPO_ROOT}/scripts/launch-glimpse.sh"
 chmod +x "$LAUNCH_CIMTOOL" "$LAUNCH_GLIMPSE"
@@ -246,6 +285,21 @@ else
 	echo "  WARNING: ${FLUXBOX_MENU} not found — skipping menu entries." >&2
 fi
 
+# --- Section 8: Default web browser (CIMTool "open in browser") ---------------
+# CIMTool's "open in browser" (and any xdg-open call) needs a registered default
+# handler for text/html and the http(s) schemes. With none set, xdg-open falls
+# back to mousepad and HTML profile docs open as source text. Point all three at
+# netsurf (installed in section 1). Writes to this user's ~/.config/mimeapps.list.
+echo
+echo "[8/8] Registering netsurf as the default web browser..."
+if command -v xdg-mime >/dev/null 2>&1; then
+	xdg-mime default netsurf-gtk.desktop \
+		text/html x-scheme-handler/http x-scheme-handler/https
+	echo "  text/html + http(s) -> netsurf-gtk.desktop"
+else
+	echo "  WARNING: xdg-mime not found — skipping browser default." >&2
+fi
+
 echo
 echo "==============================================================="
 echo " Setup complete."
@@ -254,5 +308,6 @@ echo "   GUI apps  : open forwarded port 6080 (noVNC, password 'cimtool'),"
 echo "               then right-click the desktop -> CIMTool or GLIMPSE"
 echo "               (or run scripts/launch-cimtool.sh / launch-glimpse.sh)."
 echo "   CIMTool   : opens ${CIMTOOL_WS} with the CGMES-CIM17 project loaded."
+echo "   GLIMPSE   : Load samples from ${GLIMPSE_WS} (sidebar bookmark)."
 echo "   Samples   : sample_models/IEEE9500bal.xml (or IEEE13.xml if slow)."
 echo "==============================================================="

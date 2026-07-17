@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "cimgraph-demo"
-version = "0.1.0"
+version = "0.2.1"
 description = "CIMantic Graphs demo notebooks and utilities"
 requires-python = ">=3.10,<3.15"
 # The codespace demo runs cimgraph against CIM XML files directly (no database).
@@ -12,15 +12,20 @@ requires-python = ">=3.10,<3.15"
 # not published to PyPI and were previously sourced from a local sibling checkout
 # that does not exist in a codespace. See README for enabling OpenDSS export.
 dependencies = [
-    "cim-graph>=0.5.0a2",
+    "cim-graph>=0.5.0a7",
     "ipykernel>=6.0",
     "notebook>=7.0",
+    "cimhub-opendss>=2.0.0a1",
+    "opendssdirect-py>=0.9.4",
 ]
 
 [dependency-groups]
 dev = [
     "jupyter>=1.0",
 ]
+
+[tool.hatch.metadata]
+allow-direct-references = true
 
 [tool.hatch.build.targets.wheel]
 packages = ["cimgraph_demo"]
