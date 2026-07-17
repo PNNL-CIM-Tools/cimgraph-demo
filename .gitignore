@@ -4,6 +4,7 @@ CIMTool-Releases/
 # Sample CIM feeder models — downloaded at postCreate by scripts/setup.sh
 # (from the GRIDAPPSD Powergrid-Models repo), not committed here.
 sample_models/
+*.xml
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
