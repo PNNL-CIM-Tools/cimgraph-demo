@@ -43,18 +43,10 @@ several minutes — subsequent starts are fast (downloads are cached under `/opt
 ## Run the notebooks (CIMantic Graphs)
 
 Open a notebook in VS Code and select the **`Python (cimgraph-demo)`** kernel.
-Start with `04_build_network_demo.ipynb` — it walks through building a complete
+Start with `build_network_demo.ipynb` — it walks through building a complete
 CIM network model by hand, exporting it to CIM XML, and reading it back.
 
-![Open notebook](./images/open_notebook.png)
 
-Selecting the kernel:
-
-![Select kernel](./images/startup_1.png)
-
-Run cells with `shift + enter` or the play button.
-
-![Run notebook](./images/run_notebook.png)
 
 ### Optional: OpenDSS export
 
@@ -87,11 +79,15 @@ CIMTool opens on the `~/cimtool-ws` workspace with the **CGMES-CIM17** project
 
 ### Sample CIM models
 
-Two IEEE feeder models are downloaded into `sample_models/` at setup so they show up
-in the app file explorers:
+Two IEEE feeder models are downloaded into `sample_models/` at setup:
 
 * **`sample_models/IEEE9500bal.xml`** (~54 MB) — the headline demo model.
 * **`sample_models/IEEE13.xml`** (~407 KB) — a small fallback if the software-rendered
   graph is slow on the noVNC desktop.
 
-Open either in **GLIMPSE** via its **Load** button, or import it into **CIMTool**.
+**In GLIMPSE:** click **Load**. GLIMPSE's file dialog opens at your home folder,
+where the samples are linked into **`~/glimpse-ws`** (also pinned in the dialog's
+sidebar as *GLIMPSE samples*) — pick a model there. The files themselves stay in
+`sample_models/`; `~/glimpse-ws` just holds links so the dialog can see them.
+
+**In CIMTool:** import from `sample_models/` in the workspace.
